@@ -1,0 +1,6 @@
+{
+  "username": "developer@email",
+  "password": "password",
+  "headless": false,
+  "debug": false
+}
