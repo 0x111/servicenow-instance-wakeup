@@ -2,14 +2,13 @@ package main
 
 import (
 	"context"
-	"flag"
-	"log"
-
 	"encoding/json"
+	"flag"
 	"github.com/chromedp/chromedp"
-	"github.com/chromedp/chromedp/client"
 	"io/ioutil"
+	"log"
 	"os"
+	"time"
 )
 
 type User struct {
@@ -29,6 +28,8 @@ func main() {
 	userDetails.Debug = *flag.Bool("debug", false, "bool, if you want debug output or not, default:false")
 	flag.Parse()
 
+	log.Println("Loading config file...")
+
 	// Read config into struct if exists
 	userDetails = readConfig()
 
@@ -37,42 +38,40 @@ func main() {
 		os.Exit(1)
 	}
 
-	// create context
-	ctxt, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	opts := []chromedp.ExecAllocatorOption{
+		chromedp.NoFirstRun,
+		chromedp.NoDefaultBrowserCheck,
+		chromedp.DisableGPU,
+	}
 
-	//c, err := getInstance(userDetails, ctxt)
-	// create chrome instance
-	var c *chromedp.CDP
+	log.Printf("Starting app with debug=%t and headless=%t", userDetails.Debug, userDetails.ChromeHeadless)
 
+	// navigate to a page, wait for an element, click
 	if !userDetails.Debug {
 		log.SetOutput(ioutil.Discard)
 	}
 
 	if userDetails.ChromeHeadless {
-		c, err = chromedp.New(ctxt, chromedp.WithTargets(client.New().WatchPageTargets(ctxt)), chromedp.WithLog(log.Printf))
-	} else {
-		c, err = chromedp.New(ctxt, chromedp.WithLog(log.Printf))
+		opts = append(opts, chromedp.Headless)
 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer cancel()
+
+	// create chrome instance
+	ctx, cancel := chromedp.NewContext(
+		allocCtx,
+		chromedp.WithDebugf(log.Printf),
+	)
+	defer cancel()
+
+	// create a timeout
+	ctx, cancel = context.WithTimeout(ctx, 20*time.Second)
+	defer cancel()
 
 	// run task list
-	err = c.Run(ctxt, wakeUpInstance(userDetails.Username, userDetails.Password))
-	if err != nil {
-		log.Fatal(err)
-	}
+	err = chromedp.Run(ctx, wakeUpInstance(userDetails.Username, userDetails.Password))
 
-	// shutdown chrome
-	err = c.Shutdown(ctxt)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// wait for chrome to finish
-	err = c.Wait()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,16 +79,13 @@ func main() {
 
 func wakeUpInstance(username string, password string) chromedp.Tasks {
 	return chromedp.Tasks{
-		chromedp.Navigate(`https://developer.servicenow.com/ssologin.do?relayState=%2Fapp.do%23!%2Fdashboard`),
-		chromedp.WaitVisible(`#logo`),
+		// This is the url which you are redirected to
+		// after opening an inactive instance https://developer.servicenow.com/app.do#!/instance?wu=true
+		chromedp.Navigate(`https://developer.servicenow.com/ssologin.do?relayState=%2Fapp.do%23%21%2Finstance%3Fwu%3Dtrue`),
+		chromedp.WaitVisible(`.logo`),
 		chromedp.SendKeys(`#username`, username, chromedp.ByID),
 		chromedp.SendKeys(`#password`, password, chromedp.ByID),
 		chromedp.Click(`#submitButton`, chromedp.ByID),
-		chromedp.WaitVisible(`#dp-hdr-userinfo-link`, chromedp.ByID),
-		chromedp.WaitVisible(`#dp-hdr-br-manage-link`, chromedp.ByID),
-		chromedp.Click(`#dp-hdr-br-manage-link`, chromedp.ByID),
-		chromedp.WaitVisible(`#dp-hdr-br-link-instance`, chromedp.ByID),
-		chromedp.Click(`#dp-hdr-br-link-instance`, chromedp.ByID),
 		chromedp.WaitVisible(`#instanceWakeUpBtn`, chromedp.ByID),
 		chromedp.Click(`#instanceWakeUpBtn`, chromedp.ByID),
 		chromedp.WaitNotVisible(`#dp-instance-hib-overlay`, chromedp.ByID),
@@ -118,7 +114,3 @@ func readConfig() *User {
 
 	return &userInfo
 }
-
-//func getInstance(userDetails *User, ctxt context.Context) (*chromedp.CDP, error) {
-//	return c, err
-//}
