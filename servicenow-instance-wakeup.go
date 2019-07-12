@@ -20,18 +20,22 @@ type User struct {
 
 func main() {
 	var err error
+	var configFile string
 	userDetails := &User{}
 
-	userDetails.Username = *flag.String("username", "", "write the username/email with which you are loggin in to the developers account")
-	userDetails.Password = *flag.String("password", "", "write the password with which you are loggin in to the developers account")
-	userDetails.ChromeHeadless = *flag.Bool("headless", false, "bool, if we need headless mode with chrome or not, default:false")
-	userDetails.Debug = *flag.Bool("debug", false, "bool, if you want debug output or not, default:false")
+	flag.StringVar(&userDetails.Username, "username", "", "write the username/email with which you are loggin in to the developers account")
+	flag.StringVar(&userDetails.Password, "password", "", "write the password with which you are loggin in to the developers account")
+	flag.BoolVar(&userDetails.ChromeHeadless, "headless", false, "bool, if we need headless mode with chrome or not, default:false")
+	flag.BoolVar(&userDetails.Debug, "debug", false, "bool, if you want debug output or not, default:false")
+	flag.StringVar(&configFile, "config", "", "Provide the config file name, it can be a relative path or a full path, e.g. /home/user/servicenow-config.json or just simply 'config.json'")
 	flag.Parse()
 
-	log.Println("Loading config file...")
-
 	// Read config into struct if exists
-	userDetails = readConfig()
+	if configFile != "" {
+		log.Println("Your flags will be ignored and replaced by the values in the config file you specified...")
+		log.Printf("Loading config file under the path [%s]", configFile)
+		userDetails = readConfig(configFile)
+	}
 
 	if userDetails == nil || len(userDetails.Username) == 0 || len(userDetails.Password) == 0 {
 		log.Println("No username or password provided. Use the -username and -password flags to set the username or password. e.g. program -username user@email.tld or setup a config.json with the details")
@@ -44,7 +48,7 @@ func main() {
 		chromedp.DisableGPU,
 	}
 
-	log.Printf("Starting app with debug=%t and headless=%t", userDetails.Debug, userDetails.ChromeHeadless)
+	log.Printf("Starting the app with debug=%t/headless=%t/account=%s", userDetails.Debug, userDetails.ChromeHeadless, userDetails.Username)
 
 	// navigate to a page, wait for an element, click
 	if !userDetails.Debug {
@@ -66,7 +70,7 @@ func main() {
 	defer cancel()
 
 	// create a timeout
-	ctx, cancel = context.WithTimeout(ctx, 20*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 
 	// run task list
@@ -92,11 +96,13 @@ func wakeUpInstance(username string, password string) chromedp.Tasks {
 	}
 }
 
-func readConfig() *User {
-	jsonFile, err := os.Open("config.json")
+// Read the config file if required and load the json to the struct
+func readConfig(config string) *User {
+	// Load the specified config file from the path provided
+	jsonFile, err := os.Open(config)
 
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 		return nil
 	}
 
