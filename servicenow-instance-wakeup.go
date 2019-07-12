@@ -23,8 +23,8 @@ func main() {
 	var configFile string
 	userDetails := &User{}
 
-	flag.StringVar(&userDetails.Username, "username", "", "write the username/email with which you are loggin in to the developers account")
-	flag.StringVar(&userDetails.Password, "password", "", "write the password with which you are loggin in to the developers account")
+	flag.StringVar(&userDetails.Username, "username", "", "write the username/email with which you are logging in to the developers account")
+	flag.StringVar(&userDetails.Password, "password", "", "write the password with which you are logging in to the developers account")
 	flag.BoolVar(&userDetails.ChromeHeadless, "headless", false, "bool, if we need headless mode with chrome or not, default:false")
 	flag.BoolVar(&userDetails.Debug, "debug", false, "bool, if you want debug output or not, default:false")
 	flag.StringVar(&configFile, "config", "", "Provide the config file name, it can be a relative path or a full path, e.g. /home/user/servicenow-config.json or just simply 'config.json'")
