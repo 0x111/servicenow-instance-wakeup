@@ -89,7 +89,7 @@ func wakeUpInstance(username string, password string) chromedp.Tasks {
 		chromedp.WaitVisible(`.logo`),
 		chromedp.SendKeys(`#username`, username, chromedp.ByID),
 		chromedp.Click(`#usernameSubmitButton`, chromedp.ByID),
-		chromedp.WaitVisible(`.logo`),
+		chromedp.WaitVisible(`#password`),
 		chromedp.SendKeys(`#password`, password, chromedp.ByID),
 		chromedp.Click(`#submitButton`, chromedp.ByID),
 		chromedp.WaitVisible(`#instanceWakeUpBtn`, chromedp.ByID),
