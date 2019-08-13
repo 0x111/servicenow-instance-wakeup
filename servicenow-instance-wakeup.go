@@ -88,6 +88,8 @@ func wakeUpInstance(username string, password string) chromedp.Tasks {
 		chromedp.Navigate(`https://developer.servicenow.com/ssologin.do?relayState=%2Fapp.do%23%21%2Finstance%3Fwu%3Dtrue`),
 		chromedp.WaitVisible(`.logo`),
 		chromedp.SendKeys(`#username`, username, chromedp.ByID),
+		chromedp.Click(`#usernameSubmitButton`, chromedp.ByID),
+		chromedp.WaitVisible(`#password`),
 		chromedp.SendKeys(`#password`, password, chromedp.ByID),
 		chromedp.Click(`#submitButton`, chromedp.ByID),
 		chromedp.WaitVisible(`#instanceWakeUpBtn`, chromedp.ByID),
