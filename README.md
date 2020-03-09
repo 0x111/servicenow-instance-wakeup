@@ -62,5 +62,4 @@ You can change them below if you with as demonstrated below.
 docker run -e USERNAME='YOUR_USERNAME@YOUR_DOMAIN.com' -e PASSWORD='YOUR_SERVICENOW_DEVELOPER_PASSWORD' -e DEBUG=`true` -e HEADLESS='false` servicenowinstancewakeup
 ```
 
-
 If you have any bugs or suggestions please open an issue or pull request.
