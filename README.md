@@ -31,4 +31,36 @@ If we do not want to always specify parameters, we could use the config file in 
 }
 ```
 
+## Docker
+
+To simplify all cross platform delivery, the following docker iamge is capable of waking your ServiceNow Developer Instance
+
+In order to build this image do the following. 
+
+Clone this github repository and change into the cloned directory
+
+To build the image run the following
+```bash
+docker build --rm -f "Dockerfile" -t servicenowinstancewakeup:latest "."
+```
+
+To run the docker image run the following
+```bash
+docker run -e USERNAME='YOUR_USERNAME@YOUR_DOMAIN.com' -e PASSWORD='YOUR_SERVICENOW_DEVELOPER_PASSWORD' servicenowinstancewakeup
+```
+The DEBUG and HEADLESS options are available in this container should you need them. 
+
+By default the following options are set with the reality that this is a container and should be unchanging.
+
+> DEBUG = false
+
+> HEADLESS = true
+
+You can change them below if you with as demonstrated below.
+
+```bash
+docker run -e USERNAME='YOUR_USERNAME@YOUR_DOMAIN.com' -e PASSWORD='YOUR_SERVICENOW_DEVELOPER_PASSWORD' -e DEBUG=`true` -e HEADLESS='false` servicenowinstancewakeup
+```
+
+
 If you have any bugs or suggestions please open an issue or pull request.
