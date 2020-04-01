@@ -33,7 +33,16 @@ If we do not want to always specify parameters, we could use the config file in 
 
 ## Docker
 
-To simplify all cross platform delivery, the following docker iamge is capable of waking your ServiceNow Developer Instance
+To simplify cross platform delivery, the following docker image is capable of waking your ServiceNow Developer Instance
+
+### Docker hub
+
+You can use the pre-built docker image from the [Docker hub](https://hub.docker.com/r/ruthless/servicenow-instance-wakeup) or you can pull the image issuing this command:
+```
+docker pull ruthless/servicenow-instance-wakeup
+```
+
+### Build from source
 
 In order to build this image do the following. 
 
@@ -46,18 +55,17 @@ docker build --rm -f "Dockerfile" -t servicenowinstancewakeup:latest "."
 
 To run the docker image run the following
 ```bash
-docker run -e USERNAME='YOUR_USERNAME@YOUR_DOMAIN.com' -e PASSWORD='YOUR_SERVICENOW_DEVELOPER_PASSWORD' servicenowinstancewakeup
+docker run -e USERNAME='YOUR_USERNAME@YOUR_DOMAIN.com' -e PASSWORD='YOUR_SERVICENOW_DEVELOPER_PASSWORD' servicenow-instance-wakeup
 ```
-The DEBUG and HEADLESS options are available in this container should you need them. 
+The DEBUG and HEADLESS environment variables are available in this container should you need them. 
 
-By default the following options are set with the reality that this is a container and should be unchanging.
+By default the following env variables are set:
+```bash
+DEBUG = false
+HEADLESS = true
+````
 
-> DEBUG = false
-
-> HEADLESS = true
-
-You can change them below if you with as demonstrated below.
-
+You can configure any of the existing cli flags in the docker container using the env variables. A full example could be something like this:
 ```bash
 docker run -e USERNAME='YOUR_USERNAME@YOUR_DOMAIN.com' -e PASSWORD='YOUR_SERVICENOW_DEVELOPER_PASSWORD' -e DEBUG=`true` -e HEADLESS='false` servicenowinstancewakeup
 ```
