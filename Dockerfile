@@ -1,6 +1,6 @@
 FROM golang as builder
 ADD . /src
-RUN cd /src && make
+RUN cd /src && make linux_amd64
 
 #-------
 FROM chromedp/headless-shell
