@@ -2,6 +2,17 @@
 
 This app is here to help you with wakeing up your instance if needed.
 
+----
+**Disclaimer**: This app is not made to keep your instance awake. This app was created due to the amount of time it takes for you, to wake up your instance. 
+
+It takes you approximately three to four minutes (sometimes more), to wake up your instance up right now. 90% of this time, is spent with waiting for redirects, filling out the username and password, waiting for some more redirects and then pushing one button.
+
+This app can be used, to reduce the time to do the manual steps required to wake up your instance. I do not condone keeping any instance awake just for the sake of it. This app only clicks the wakeup button if existing. This is not generating any actions that would keep your instance awake. It is simply emulating the manual tasks that you would do anyways if your instance would go to sleep. The app does not even work or does anything if your instance is already awake.
+
+This is not a software to keep any instance awake. Please respect that! There were attempts, to make this a tool to keep it awake, like you can see in [#10](https://github.com/0x111/servicenow-instance-wakeup/issues/10) but this was rejected. Simply said, please do not categorize this app as something, that is jeopardizing the free PDI program. It has nothing to do with it. 
+
+----
+
 All of you who work with dev instances, you know what is this about.
 Dev instances expire after a specific time period.
 

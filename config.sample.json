@@ -2,5 +2,6 @@
   "username": "developer@email",
   "password": "password",
   "headless": false,
-  "debug": false
+  "debug": false,
+  "timeout": 60
 }
