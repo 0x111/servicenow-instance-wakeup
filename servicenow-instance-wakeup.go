@@ -24,6 +24,7 @@ func main() {
 	var err error
 	var configFile string
 	var timeout time.Duration
+	var seconds int64
 	userDetails := &User{}
 
 	flag.StringVar(&userDetails.Username, "username", "", "write the username/email with which you are logging in to the developers account")
@@ -31,7 +32,7 @@ func main() {
 	flag.BoolVar(&userDetails.ChromeHeadless, "headless", false, "bool, if we need headless mode with chrome or not, default:false")
 	flag.BoolVar(&userDetails.Debug, "debug", false, "bool, if you want debug output or not, default:false")
 	flag.StringVar(&configFile, "config", "", "Provide the config file name, it can be a relative path or a full path, e.g. /home/user/servicenow-config.json or just simply 'config.json'")
-	flag.DurationVar(&timeout, "timeout", 60, "Set the timeout after which the app should exit. This is a number in seconds, default:60")
+	flag.Int64Var(&seconds, "timeout", 60, "Set the timeout after which the app should exit. This is a number in seconds, default:60")
 	flag.Parse()
 
 	// Read config into struct if exists
@@ -73,6 +74,8 @@ func main() {
 	)
 	defer cancel()
 
+	timeout = time.Duration(seconds) * time.Second
+
 	err = wakeUpInstance(ctx, userDetails.Username, userDetails.Password, timeout)
 
 	if err != nil {
@@ -84,10 +87,17 @@ func main() {
 func wakeUpInstance(ctx context.Context, username string, password string, timeout time.Duration) error {
 	var cancel func()
 	// create a timeout
-	ctx, cancel = context.WithTimeout(ctx, timeout*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	initialURL := "https://developer.servicenow.com/ssologin.do?relayState=%2Fdev.do%23%21%2Fhome"
+
+	// setting viewport to a wider screen so we see the wakeup button
+	if err := chromedp.Run(ctx, chromedp.EmulateViewport(1920, 1280)); err != nil {
+		return fmt.Errorf("could not set viewport: %v", err)
+	} else {
+		fmt.Printf("Successfully set the viewport...\n")
+	}
 
 	fmt.Printf("Navigating to the webpage: %s\n", initialURL)
 	// first navigate to the sso login page

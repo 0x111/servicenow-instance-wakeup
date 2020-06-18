@@ -1,13 +1,19 @@
 # servicenow-instance-wakeup
 
-This app is here to help you with wakeing up your instance if needed.
+At the first sight, this project may look like something you might have seen before.
+A promise of never waking up your instance anymore. If you are in a search of something like that, you are in the wrong place!
+
+This app symbolizes everything, that the process of waking up your instance should be!
+A simple task of issuing one command to wake up your instance. No more time spent waiting on redirects.
+
+Simply run the app and do something useful in the meanwhile instead of repetitive steps to wake your instance.
 
 ----
 **Disclaimer**: This app is not made to keep your instance awake. This app was created due to the amount of time it takes for you, to wake up your instance. 
 
-It takes you approximately three to four minutes (sometimes more), to wake up your instance up right now. 90% of this time, is spent with waiting for redirects, filling out the username and password, waiting for some more redirects and then pushing one button.
+It takes you approximately three to four minutes (sometimes more), to wake up your instance right now. 90% of this time, is spent with waiting for redirects, filling out the username and password, waiting for some more redirects and then pushing one button.
 
-This app can be used, to reduce the time to do the manual steps required to wake up your instance. I do not condone keeping any instance awake just for the sake of it. This app only clicks the wakeup button if existing. This is not generating any actions that would keep your instance awake. It is simply emulating the manual tasks that you would do anyways if your instance would go to sleep. The app does not even work or does anything if your instance is already awake.
+This app can be used, to reduce the time to do the manual steps required to wake up your instance. I do not condone keeping any instance awake just for the sake of it. This app only clicks the wake up button if existing (e.g. if the instance is already hibernated). This is not generating any actions that would keep your instance awake. It is simply emulating the manual tasks that you would do anyways if your instance would go to sleep. The app does not even work or does anything if your instance is already awake.
 
 This is not a software to keep any instance awake. Please respect that! There were attempts, to make this a tool to keep it awake, like you can see in [#10](https://github.com/0x111/servicenow-instance-wakeup/issues/10) but this was rejected. Simply said, please do not categorize this app as something, that is jeopardizing the free PDI program. It has nothing to do with it. 
 
@@ -16,17 +22,15 @@ This is not a software to keep any instance awake. Please respect that! There we
 All of you who work with dev instances, you know what is this about.
 Dev instances expire after a specific time period.
 
-With this program, you do not need to log in manually to the developer portal anymore to wake up your instance.
+With this software, you do not need to log in manually to the developer portal anymore to wake up your instance.
 
 All this app is doing is taking your login credentials, logging you into the developer portal and then waking up your instance.
-
-You can use this both ways but only choose one.
 
 The app accepts cli parameters but if this is not something you would like to do, then you can have a `config.json` file in the same directory as the program based on the sample file here.
 
 So an example for the cli app would be something like this:
 ```
-program -username=some@email -password=somepassword -debug=false
+program -username some@email -password somepassword -debug false
 ```
 
 This would mean that the program will be started with the specified username and password values and with debugging disabled.
@@ -37,6 +41,7 @@ If we do not want to always specify parameters, we could use the config file in 
 {
   "username": "developer@email",
   "password": "password",
+  "timeout": 60,
   "headless": false,
   "debug": false
 }
@@ -44,33 +49,39 @@ If we do not want to always specify parameters, we could use the config file in 
 
 ## Docker
 
-To simplify cross platform delivery, the following docker image is capable of waking your ServiceNow Developer Instance
+To simplify cross platform delivery, the following docker image is capable of waking your ServiceNow Developer Instance.
+
+**Note**: This image does not contain anything, that would run the app periodically or automate it in any way.
+You run the docker image, the app starts and after the specified timeout it does exit and thus, the docker container does the same too.
+You should only run servicenow-instance-wakeup when you need to wake up your instance to try something. It is not recommended to run this
+periodically.
+
 
 ### Docker hub
 
-You can use the pre-built docker image from the [Docker hub](https://hub.docker.com/r/ruthless/servicenow-instance-wakeup) or you can pull the image issuing this command:
+You can use the pre-built docker image from the [Docker hub](https://hub.docker.com/r/ruthless/servicenow-instance-wakeup) or you can pull the image.
 ```
 docker pull ruthless/servicenow-instance-wakeup
 ```
 
 ### Build from source
 
-In order to build this image do the following. 
+In order to build this image from source yourself, follow these steps. 
 
-Clone this github repository and change into the cloned directory
+Clone this github repository and change into the cloned directory.
 
-To build the image run the following
+Run the build process:
 ```bash
 docker build --rm -f "Dockerfile" -t servicenowinstancewakeup:latest "."
 ```
 
-To run the docker image run the following
+After the build is done, you are ready to run your own docker image:
 ```bash
 docker run -e USERNAME='YOUR_USERNAME@YOUR_DOMAIN.com' -e PASSWORD='YOUR_SERVICENOW_DEVELOPER_PASSWORD' servicenow-instance-wakeup
 ```
 The DEBUG and HEADLESS environment variables are available in this container should you need them. 
 
-By default the following env variables are set:
+By default, the following environment variables are set:
 ```bash
 DEBUG = false
 HEADLESS = true
@@ -81,4 +92,6 @@ You can configure any of the existing cli flags in the docker container using th
 docker run -e USERNAME='YOUR_USERNAME@YOUR_DOMAIN.com' -e PASSWORD='YOUR_SERVICENOW_DEVELOPER_PASSWORD' -e DEBUG=`true` -e HEADLESS='false` servicenowinstancewakeup
 ```
 
-If you have any bugs or suggestions please open an issue or pull request.
+If you have any bugs or suggestions please open an issue or pull request!
+
+Every contribution is welcome!
