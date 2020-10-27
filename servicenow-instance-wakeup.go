@@ -150,33 +150,20 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
 		fmt.Printf("Login successful!\n")
 	}
 
-    fmt.Printf("Wait button")
+    fmt.Printf("Wait button\n")
     chromedp.WaitVisible(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > div > div.dps-navigation-header-utility > ul > li.dps-navigation-header-list-item > dps-login").shadowRoot.querySelector("div > button")`, chromedp.ByJSPath)
-    fmt.Printf("Button is it")
+    fmt.Printf("Button is it\n")
 
-    if err := chromedp.Click(`[@class='dps-login']`, chromedp.BySearch); err != nil {
-       return fmt.Errorf("Could not click button: %v", err)
-    } else {
-        fmt.Printf("Clicked successfully!\n")
-    }
+    var resInstanceBlock int
 
-    fmt.Printf("Update\n")
-	fmt.Printf("Detecting the wakeup button element to determine if we are on the developer portal homepage...\n")
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button")`, chromedp.ByJSPath)); err != nil {
-		return fmt.Errorf("could not find shadow element (header status bar): %v", err)
-	} else {
-		fmt.Printf("Element found\n")
-	}
-
-	fmt.Printf("Sleep for a %d seconds for the render of the nodes...\n", 5)
-	time.Sleep(5 * time.Second)
+    fmt.Printf("Click on the button\n")
+    chromedp.EvaluateAsDevTools(`(function(){document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > div > div.dps-navigation-header-utility > ul > li.dps-navigation-header-list-item > dps-login").shadowRoot.querySelector("div > button").click();return 1})`, resInstanceBlock)
 
 	var res int
-	if err := chromedp.Run(ctx, chromedp.EvaluateAsDevTools(`(function(){document.querySelector("body > dps-app").shadowRoot.querySelector("div > main > dps-home-auth").shadowRoot.querySelector("div > div > div.instance-widget > dps-instance-sidebar").shadowRoot.querySelector("div > div.dps-instance-sidebar-content.dps-instance-sidebar-content-instance-info > div.dps-instance-sidebar-content-btn-group > dps-button").shadowRoot.querySelector("button").click();return 1;})()`, &res)); err != nil {
-		return fmt.Errorf("could not click on shadow element (button): %v", err)
-	} else {
-		fmt.Println("Clicked on the Wakeup instance button! Exiting...")
-	}
+	fmt.Printf("Start find button for wakeup\n")
+	chromedp.WaitVisible(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button")`)
+    fmt.Printf("Start wakeup instance\n")
+	chromedp.EvaluateAsDevTools(`(function(){document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button").click();return 1;})()`, &res)
 
 	return nil
 }
