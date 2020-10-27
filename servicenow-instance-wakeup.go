@@ -157,13 +157,15 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
     var resInstanceBlock int
 
     fmt.Printf("Click on the button\n")
-    chromedp.EvaluateAsDevTools(`(function(){document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > div > div.dps-navigation-header-utility > ul > li.dps-navigation-header-list-item > dps-login").shadowRoot.querySelector("div > button").click();return 1})`, resInstanceBlock)
+    chromedp.EvaluateAsDevTools(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > div > div.dps-navigation-header-utility > ul > li.dps-navigation-header-list-item > dps-login").shadowRoot.querySelector("div > button").click()`, resInstanceBlock)
+    fmt.Printf("Clicked successfully")
 
 	var res int
 	fmt.Printf("Start find button for wakeup\n")
 	chromedp.WaitVisible(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button")`)
     fmt.Printf("Start wakeup instance\n")
-	chromedp.EvaluateAsDevTools(`(function(){document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button").click();return 1;})()`, &res)
+	chromedp.EvaluateAsDevTools(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button").click()`, &res)
+	fmt.Printf("Finished\n")
 
 	return nil
 }
