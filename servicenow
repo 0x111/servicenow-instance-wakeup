@@ -1,0 +1,1 @@
+* * * * * bash /app/servicenow.sh >> /var/log/service-now.log 2>&1

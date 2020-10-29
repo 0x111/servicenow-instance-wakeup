@@ -90,14 +90,7 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
 	ctx, cancel = context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	initialURL := "https://developer.servicenow.com/ssologin.do?relayState=%2Fdev.do%23%21%2Fhome"
-
-	// setting viewport to a wider screen so we see the wakeup button
-	if err := chromedp.Run(ctx, chromedp.EmulateViewport(1920, 1280)); err != nil {
-		return fmt.Errorf("could not set viewport: %v", err)
-	} else {
-		fmt.Printf("Successfully set the viewport...\n")
-	}
+	initialURL := "https://signon.service-now.com/ssologin.do?RelayState=%252Fapp%252Ftemplate_saml_2_0%252Fk317zlfESMUHAFZFXMVB%252Fsso%252Fsaml%253FRelayState%253Dhttps%25253A%25252F%25252Fdeveloper.servicenow.com%25252Fsaml_redirector.do%25253Fsysparm_nostack%25253Dtrue%252526sysparm_uri%25253D%2525252Fnav_to.do%2525253Furi%2525253D%252525252Fssologin.do%252525253FrelayState%252525253Dhttps%25252525253A%25252525252F%25252525252Fdeveloper.servicenow.com%25252525252Fdev.do%252525252523%252521%25252525252Fhome&redirectUri=&email="
 
 	fmt.Printf("Navigating to the webpage: %s\n", initialURL)
 	// first navigate to the sso login page
@@ -105,13 +98,6 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
 		return fmt.Errorf("could not navigate to the SSO login page: %v", err)
 	} else {
 		fmt.Printf("Successfully navigated to the webpage...\n")
-	}
-
-	fmt.Printf("Searching for the .logo element...\n")
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`.logo`)); err != nil {
-		return fmt.Errorf("could not detect .logo element: %v", err)
-	} else {
-		fmt.Printf("Found .logo element\n")
 	}
 
 	fmt.Printf("Filling out the username field...\n")
@@ -166,17 +152,17 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
 
     fmt.Printf("Clicked successfully\n")
 
-	var finalRes int
-
 	fmt.Printf("Start find button for wakeup\n")
 
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button")`, chromedp.ByJSPath)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.WaitVisible(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button.dps-button.-secondary.-sm > span")`, chromedp.ByJSPath)); err != nil {
 	    return fmt.Errorf("Button was not found: %v", err)
 	}
 
     fmt.Printf("Start wakeup instance\n")
 
-    chromedp.Run(ctx, chromedp.EvaluateAsDevTools(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button").click()`, &finalRes))
+    var finalRes int
+
+    chromedp.Run(ctx, chromedp.EvaluateAsDevTools(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > header > dps-navigation-header").shadowRoot.querySelector("header > dps-navigation-header-dropdown > dps-navigation-login-management").shadowRoot.querySelector("dps-navigation-header-dropdown-content > dps-navigation-section > dps-navigation-instance-management").shadowRoot.querySelector("div.dps-navigation-instance-management > div.dps-navigation-instance-management-content > dps-content-stack > dps-button").shadowRoot.querySelector("button.dps-button.-secondary.-sm > span").click()`, &finalRes))
 
 	fmt.Printf("Finished\n")
 

@@ -2,3 +2,4 @@ config.json
 build/
 servicenow-instance-wakeup
 .idea/
+.env
