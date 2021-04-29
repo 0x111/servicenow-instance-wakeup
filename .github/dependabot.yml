@@ -1,0 +1,15 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: github.com/chromedp/chromedp
+    versions:
+    - 0.6.5
+    - 0.6.6
+    - 0.6.8
+    - 0.6.9
