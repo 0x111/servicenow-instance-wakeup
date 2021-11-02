@@ -91,6 +91,7 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
 	defer cancel()
 
 	initialURL := "https://developer.servicenow.com/userlogin.do?relayState=https%3A%2F%2Fdeveloper.servicenow.com%2Fdev.do%23!%2Fhome%3Fwu%3Dtrue"
+
 	// setting viewport to a wider screen so we see the wakeup button
 	if err := chromedp.Run(ctx, chromedp.EmulateViewport(1920, 1280)); err != nil {
 		return fmt.Errorf("could not set viewport: %v", err)
