@@ -64,6 +64,15 @@ You can use the pre-built docker image from the [Docker hub](https://hub.docker.
 docker pull ruthless/servicenow-instance-wakeup
 ```
 
+### :new: Github Packages
+Due to recent changes to Docker Hub and their operations model, I will now publish new images on github packages too :tada:
+You can pull this image with the command below:
+```
+docker pull ghcr.io/0x111/servicenow-instance-wakeup:latest
+```
+This will pull the latest image, for other version see more on the right.
+Eventually I will most likely wind down docker hub and use github packages only. (The timeline mostly depends on how and what kind of changes they will make in the near future...)
+
 ### Build from source
 
 In order to build this image from source yourself, follow these steps. 
