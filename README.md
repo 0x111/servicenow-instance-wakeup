@@ -66,6 +66,7 @@ docker pull ruthless/servicenow-instance-wakeup
 
 ### :new: Github Packages
 Due to recent changes to Docker Hub and their operations model, I will now publish new images on github packages too :tada:
+
 You can pull this image with the command below:
 ```
 docker pull ghcr.io/0x111/servicenow-instance-wakeup:latest
