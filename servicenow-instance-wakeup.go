@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 	"io/ioutil"
 	"log"
@@ -12,7 +14,7 @@ import (
 	"time"
 )
 
-type User struct {
+type Configuration struct {
 	Username       string        `json:"username"`
 	Password       string        `json:"password"`
 	ChromeHeadless bool          `json:"headless"`
@@ -25,12 +27,12 @@ func main() {
 	var configFile string
 	var timeout time.Duration
 	var seconds int64
-	userDetails := &User{}
+	configuration := &Configuration{}
 
-	flag.StringVar(&userDetails.Username, "username", "", "write the username/email with which you are logging in to the developers account")
-	flag.StringVar(&userDetails.Password, "password", "", "write the password with which you are logging in to the developers account")
-	flag.BoolVar(&userDetails.ChromeHeadless, "headless", false, "bool, if we need headless mode with chrome or not, default:false")
-	flag.BoolVar(&userDetails.Debug, "debug", false, "bool, if you want debug output or not, default:false")
+	flag.StringVar(&configuration.Username, "username", "", "write the username/email with which you are logging in to the developers account")
+	flag.StringVar(&configuration.Password, "password", "", "write the password with which you are logging in to the developers account")
+	flag.BoolVar(&configuration.ChromeHeadless, "headless", false, "bool, if we need headless mode with chrome or not, default:false")
+	flag.BoolVar(&configuration.Debug, "debug", false, "bool, if you want debug output or not, default:false")
 	flag.StringVar(&configFile, "config", "", "Provide the config file name, it can be a relative path or a full path, e.g. /home/user/servicenow-config.json or just simply 'config.json'")
 	flag.Int64Var(&seconds, "timeout", 60, "Set the timeout after which the app should exit. This is a number in seconds, default:60")
 	flag.Parse()
@@ -39,10 +41,10 @@ func main() {
 	if configFile != "" {
 		log.Println("Your flags will be ignored and replaced by the values in the config file you specified...")
 		log.Printf("Loading config file under the path [%s]", configFile)
-		userDetails = readConfig(configFile)
+		configuration = readConfig(configFile)
 	}
 
-	if userDetails == nil || len(userDetails.Username) == 0 || len(userDetails.Password) == 0 {
+	if configuration == nil || len(configuration.Username) == 0 || len(configuration.Password) == 0 {
 		log.Println("No username or password provided. Use the -username and -password flags to set the username or password. e.g. program -username user@email.tld or setup a config.json with the details")
 		os.Exit(1)
 	}
@@ -53,14 +55,14 @@ func main() {
 		chromedp.DisableGPU,
 	}
 
-	log.Printf("Starting the app with debug=%t/headless=%t/account=%s", userDetails.Debug, userDetails.ChromeHeadless, userDetails.Username)
+	log.Printf("Starting the app with debug=%t/headless=%t/account=%s", configuration.Debug, configuration.ChromeHeadless, configuration.Username)
 
 	// navigate to a page, wait for an element, click
-	if !userDetails.Debug {
+	if !configuration.Debug {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	if userDetails.ChromeHeadless {
+	if configuration.ChromeHeadless {
 		opts = append(opts, chromedp.Headless)
 	}
 
@@ -76,7 +78,7 @@ func main() {
 
 	timeout = time.Duration(seconds) * time.Second
 
-	err = wakeUpInstance(ctx, userDetails.Username, userDetails.Password, timeout)
+	err = wakeUpInstance(ctx, configuration.Username, configuration.Password, timeout)
 
 	if err != nil {
 		fmt.Println(err)
@@ -107,71 +109,75 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
 		fmt.Printf("Successfully navigated to the webpage...\n")
 	}
 
-	fmt.Printf("Searching for the .logo element...\n")
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`.logo`)); err != nil {
-		return fmt.Errorf("could not detect .logo element: %v", err)
+	fmt.Printf("Searching for the #logo-now element...\n")
+	if err := chromedp.Run(ctx, chromedp.WaitVisible(`#logo-now`)); err != nil {
+		return fmt.Errorf("could not detect #logo-now element: %v", err)
 	} else {
-		fmt.Printf("Found .logo element\n")
+		fmt.Printf("Found #logo-now element\n")
 	}
 
 	fmt.Printf("Filling out the username field...\n")
-	if err := chromedp.Run(ctx, chromedp.SendKeys(`#username`, username, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.SendKeys(`#sign_in_username`, username, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not fill out the username: %v", err)
 	} else {
 		fmt.Printf("Filled username field with %s\n", username)
 	}
 
 	fmt.Printf("Clicking the next button...\n")
-	if err := chromedp.Run(ctx, chromedp.Click(`#usernameSubmitButton`, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.Click(`#sign_in_username_btn`, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not click the next button: %v", err)
 	} else {
 		fmt.Printf("Clicked Next button\n")
 	}
 
 	fmt.Printf("Searching for the password field...\n")
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`#password`)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.WaitVisible(`#sign_in_password`, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not detect password element: %v", err)
 	} else {
 		fmt.Printf("Found password field\n")
 	}
 
 	fmt.Printf("Filling out the password field...\n")
-	if err := chromedp.Run(ctx, chromedp.SendKeys(`#password`, password, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.SendKeys(`#sign_in_password`, password, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not fill out the password: %v", err)
 	} else {
 		fmt.Printf("Filled password field with your password ******\n")
 	}
 
-	fmt.Printf("Clicking the submit button...\n")
-	if err := chromedp.Run(ctx, chromedp.Click(`#submitButton`, chromedp.ByID)); err != nil {
-		return fmt.Errorf("could not click submit button: %v", err)
+	fmt.Printf("Clicking the Sign In button...\n")
+	if err := chromedp.Run(ctx, chromedp.Click(`#sign_in_password_btn`, chromedp.ByID)); err != nil {
+		return fmt.Errorf("could not click Sign In button: %v", err)
 	} else {
-		fmt.Printf("Clicked Submit button\n")
+		fmt.Printf("Clicked Sign In button\n")
 		fmt.Printf("Login successful!\n")
 	}
 
-	fmt.Printf("Detecting the wakeup button element to determine if we are on the developer portal homepage...\n")
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > main > dps-home-auth").shadowRoot.querySelector("div > div > div.instance-widget > dps-instance-sidebar").shadowRoot.querySelector("div > div.dps-instance-sidebar-content.dps-instance-sidebar-content-instance-info > div.dps-instance-sidebar-content-btn-group > dps-button").shadowRoot.querySelector("button")`, chromedp.ByJSPath)); err != nil {
-		return fmt.Errorf("could not find shadow element (header status bar): %v", err)
+	fmt.Printf("Setting cookies to pre-confirm cookie modal!\n")
+
+	// set the cookies to remove the iframe modal
+	if err := chromedp.Run(ctx, setcookies(
+		"notice_preferences", "0",
+		"notice_gdpr_prefs", "0",
+		"cmapi_gtm_bl", "ga-ms-ua-ta-asp-bzi-sp-awct-cts-csm-img-flc-fls-mpm-mpr-m6d-tc-tdc",
+		"cmapi_cookie_privacy", "permit 1 required")); err != nil {
+		return fmt.Errorf("could not set cookies: %v", err)
 	} else {
-		fmt.Printf("Element found\n")
+		fmt.Printf("Cookies set!\n")
 	}
 
-	fmt.Printf("Sleep for a %d seconds for the render of the nodes...\n", 5)
-	time.Sleep(5 * time.Second)
-
-	var res int
-	if err := chromedp.Run(ctx, chromedp.EvaluateAsDevTools(`(function(){document.querySelector("body > dps-app").shadowRoot.querySelector("div > main > dps-home-auth").shadowRoot.querySelector("div > div > div.instance-widget > dps-instance-sidebar").shadowRoot.querySelector("div > div.dps-instance-sidebar-content.dps-instance-sidebar-content-instance-info > div.dps-instance-sidebar-content-btn-group > dps-button").shadowRoot.querySelector("button").click();return 1;})()`, &res)); err != nil {
-		return fmt.Errorf("could not click on shadow element (button): %v", err)
+	if err := chromedp.Run(ctx, chromedp.WaitVisible(`document.querySelector("body > dps-app").shadowRoot.querySelector("div > main > dps-home-auth-quebec").shadowRoot.querySelector("div > section:nth-child(1) > div > dps-page-header > div:nth-child(1)")`, chromedp.ByJSPath)); err != nil {
+		return fmt.Errorf("could not find start building button: %v", err)
 	} else {
-		fmt.Println("Clicked on the Wakeup instance button! Exiting...")
+		fmt.Printf("Start building button found\n")
 	}
+
+	fmt.Printf("Instance wakeup initiated successfully, your instance should be awake pretty soon!\n")
 
 	return nil
 }
 
 // Read the config file if required and load the json to the struct
-func readConfig(config string) *User {
+func readConfig(config string) *Configuration {
 	// Load the specified config file from the path provided
 	jsonFile, err := os.Open(config)
 
@@ -184,13 +190,43 @@ func readConfig(config string) *User {
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-	userInfo := User{}
+	configurationParameters := Configuration{}
 
-	err = json.Unmarshal(byteValue, &userInfo)
+	err = json.Unmarshal(byteValue, &configurationParameters)
 
 	if err != nil {
+		log.Fatal(err)
 		return nil
 	}
 
-	return &userInfo
+	return &configurationParameters
+}
+
+// setcookies returns a task to navigate to a host with the passed cookies set
+// on the network request.
+func setcookies(cookies ...string) chromedp.Tasks {
+	if len(cookies)%2 != 0 {
+		panic("length of cookies must be divisible by 2")
+	}
+
+	return chromedp.Tasks{
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			// create cookie expiration
+			expr := cdp.TimeSinceEpoch(time.Now().Add(180 * 24 * time.Hour))
+			// add cookies to chrome
+			for i := 0; i < len(cookies); i += 2 {
+				err := network.SetCookie(cookies[i], cookies[i+1]).
+					WithExpires(&expr).
+					WithDomain("developer.servicenow.com").
+					WithHTTPOnly(false).
+					WithSecure(true).
+					Do(ctx)
+
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}),
+	}
 }
