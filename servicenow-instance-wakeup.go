@@ -117,35 +117,35 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
 	}
 
 	fmt.Printf("Filling out the username field...\n")
-	if err := chromedp.Run(ctx, chromedp.SendKeys(`#sign_in_username`, username, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.SendKeys(`email`, username, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not fill out the username: %v", err)
 	} else {
 		fmt.Printf("Filled username field with %s\n", username)
 	}
 
 	fmt.Printf("Clicking the next button...\n")
-	if err := chromedp.Run(ctx, chromedp.Click(`#sign_in_username_btn`, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.Click(`username_submit_button`, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not click the next button: %v", err)
 	} else {
 		fmt.Printf("Clicked Next button\n")
 	}
 
 	fmt.Printf("Searching for the password field...\n")
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`#sign_in_password`, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.WaitVisible(`password`, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not detect password element: %v", err)
 	} else {
 		fmt.Printf("Found password field\n")
 	}
 
 	fmt.Printf("Filling out the password field...\n")
-	if err := chromedp.Run(ctx, chromedp.SendKeys(`#sign_in_password`, password, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.SendKeys(`password`, password, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not fill out the password: %v", err)
 	} else {
 		fmt.Printf("Filled password field with your password ******\n")
 	}
 
 	fmt.Printf("Clicking the Sign In button...\n")
-	if err := chromedp.Run(ctx, chromedp.Click(`#sign_in_password_btn`, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.Click(`password_submit_button`, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not click Sign In button: %v", err)
 	} else {
 		fmt.Printf("Clicked Sign In button\n")
