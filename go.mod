@@ -1,6 +1,6 @@
 module servicenow-instance-wakeup
 
-go 1.17
+go 1.19
 
 require (
 	github.com/chromedp/cdproto v0.0.0-20230419194459-b5ff65bc57a3
