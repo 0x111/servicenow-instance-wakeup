@@ -49,11 +49,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	opts := []chromedp.ExecAllocatorOption{
+	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.NoFirstRun,
 		chromedp.NoDefaultBrowserCheck,
 		chromedp.DisableGPU,
-	}
+	)
 
 	log.Printf("Starting the app with debug=%t/headless=%t/account=%s", configuration.Debug, configuration.ChromeHeadless, configuration.Username)
 
