@@ -1,4 +1,4 @@
-FROM golang as builder
+FROM golang:bullseye as builder
 ADD . /src
 RUN cd /src && make linux_amd64
 
