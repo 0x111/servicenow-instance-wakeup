@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/chromedp/cdproto/cdp"
-	"github.com/chromedp/cdproto/network"
-	"github.com/chromedp/chromedp"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/chromedp"
 )
 
 type Configuration struct {
@@ -49,11 +50,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	opts := append(chromedp.DefaultExecAllocatorOptions[:],
+	opts := []chromedp.ExecAllocatorOption{
 		chromedp.NoFirstRun,
 		chromedp.NoDefaultBrowserCheck,
 		chromedp.DisableGPU,
-	)
+	}
 
 	log.Printf("Starting the app with debug=%t/headless=%t/account=%s", configuration.Debug, configuration.ChromeHeadless, configuration.Username)
 
