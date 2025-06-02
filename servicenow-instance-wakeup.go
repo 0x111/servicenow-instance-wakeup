@@ -50,21 +50,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	opts := []chromedp.ExecAllocatorOption{
-		chromedp.NoFirstRun,
-		chromedp.NoDefaultBrowserCheck,
+	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.DisableGPU,
-	}
+		chromedp.Flag("headless", configuration.ChromeHeadless),
+	)
 
 	log.Printf("Starting the app with debug=%t/headless=%t/account=%s", configuration.Debug, configuration.ChromeHeadless, configuration.Username)
 
 	// navigate to a page, wait for an element, click
 	if !configuration.Debug {
 		log.SetOutput(ioutil.Discard)
-	}
-
-	if configuration.ChromeHeadless {
-		opts = append(opts, chromedp.Headless)
 	}
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)

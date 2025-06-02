@@ -3,3 +3,4 @@ build/
 servicenow-instance-wakeup
 .idea/
 .vscode/
+.DS_Store
