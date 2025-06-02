@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/chromedp/cdproto/cdp"
-	"github.com/chromedp/cdproto/network"
-	"github.com/chromedp/chromedp"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/chromedp"
 )
 
 type Configuration struct {
@@ -50,9 +51,8 @@ func main() {
 	}
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.NoFirstRun,
-		chromedp.NoDefaultBrowserCheck,
 		chromedp.DisableGPU,
+		chromedp.Flag("headless", configuration.ChromeHeadless),
 	)
 
 	log.Printf("Starting the app with debug=%t/headless=%t/account=%s", configuration.Debug, configuration.ChromeHeadless, configuration.Username)
@@ -60,10 +60,6 @@ func main() {
 	// navigate to a page, wait for an element, click
 	if !configuration.Debug {
 		log.SetOutput(ioutil.Discard)
-	}
-
-	if configuration.ChromeHeadless {
-		opts = append(opts, chromedp.Headless)
 	}
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
@@ -109,43 +105,43 @@ func wakeUpInstance(ctx context.Context, username string, password string, timeo
 		fmt.Printf("Successfully navigated to the webpage...\n")
 	}
 
-	fmt.Printf("Searching for the #logo-now element...\n")
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`#logo-now`)); err != nil {
-		return fmt.Errorf("could not detect #logo-now element: %v", err)
+	fmt.Printf("Searching for the logo element...\n")
+	if err := chromedp.Run(ctx, chromedp.WaitVisible(`logo`, chromedp.ByID)); err != nil {
+		return fmt.Errorf("could not detect logo element: %v", err)
 	} else {
-		fmt.Printf("Found #logo-now element\n")
+		fmt.Printf("Found logo element\n")
 	}
 
 	fmt.Printf("Filling out the username field...\n")
-	if err := chromedp.Run(ctx, chromedp.SendKeys(`#email`, username, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.SendKeys(`username`, username, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not fill out the username: %v", err)
 	} else {
 		fmt.Printf("Filled username field with %s\n", username)
 	}
 
 	fmt.Printf("Clicking the next button...\n")
-	if err := chromedp.Run(ctx, chromedp.Click(`#username_submit_button`, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.Click(`identify-submit`, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not click the next button: %v", err)
 	} else {
 		fmt.Printf("Clicked Next button\n")
 	}
 
 	fmt.Printf("Searching for the password field...\n")
-	if err := chromedp.Run(ctx, chromedp.WaitVisible(`#password`, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.WaitVisible(`password`, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not detect password element: %v", err)
 	} else {
 		fmt.Printf("Found password field\n")
 	}
 
 	fmt.Printf("Filling out the password field...\n")
-	if err := chromedp.Run(ctx, chromedp.SendKeys(`#password`, password, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.SendKeys(`password`, password, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not fill out the password: %v", err)
 	} else {
 		fmt.Printf("Filled password field with your password ******\n")
 	}
 
 	fmt.Printf("Clicking the Sign In button...\n")
-	if err := chromedp.Run(ctx, chromedp.Click(`#password_submit_button`, chromedp.ByID)); err != nil {
+	if err := chromedp.Run(ctx, chromedp.Click(`challenge-authenticator-submit`, chromedp.ByID)); err != nil {
 		return fmt.Errorf("could not click Sign In button: %v", err)
 	} else {
 		fmt.Printf("Clicked Sign In button\n")
