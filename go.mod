@@ -1,14 +1,14 @@
 module servicenow-instance-wakeup
 
-go 1.19
+go 1.25
 
 require (
-	github.com/chromedp/cdproto v0.0.0-20230419194459-b5ff65bc57a3
+	github.com/chromedp/cdproto v0.157.9
 	github.com/chromedp/chromedp v0.9.1
 )
 
 require (
-	github.com/chromedp/sysutil v1.0.0 // indirect
+	github.com/go-json-experiment/json v0.0.0-20260213210345-44df1a37e875 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.2.0 // indirect
